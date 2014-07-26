@@ -23,7 +23,7 @@ class Control
   void draw()
   {
     noStroke();
-    fill(bg,192);
+    fill(bg, 192);
     rect(x, y, w, h);
   }
   int hitTest()
@@ -128,7 +128,7 @@ class Slider extends Control
       }
       // Outside, fall out
     }
-    if(mousePressed&&state==CS_PRESS&&value>=0&&value<=1)
+    if (mousePressed&&state==CS_PRESS&&value>=0&&value<=1)
     {
       // Drag out of region, but continue
       updateVal();
@@ -139,8 +139,124 @@ class Slider extends Control
   }
 }
 
+class Button extends Control
+{
+  public String title;
+  Button()
+  {}
+  Button(String text, int x_pos, int y_pos, int Width, int Height, color textColor, color background)
+  {
+    title = text;
+    x = x_pos;
+    y = y_pos;
+    w = Width;
+    h = Height;
+    fg = textColor;
+    bg = background;
+  }
+  void draw()
+  {
+    noStroke();
+    switch(state)
+    {
+    case CS_NORMAL:
+      fill(bg, 153);
+      break;
+    case CS_HOVER:
+      fill(bg, 255);
+      break;
+    case CS_PRESS:
+      fill(bg, 192);
+      break;
+    }
+    rect(x, y, w, h);
+    fill(fg);
+    textSize(h/1.5);
+    textAlign(CENTER, CENTER);
+    text(title, x, y, w, h);
+  }
+  int hitTest()
+  {
+    if (mouseX>=x&&mouseX-x<=w)
+    {
+      if (mouseY>=y&&mouseY-y<=h)
+      {
+        // Mouse in area
+        if (mousePressed)
+        {
+          if (state != CS_PRESS)
+          {
+            state = CS_PRESS;
+            return CS_CLICK;
+          }
+          return CS_PRESS;
+        }
+        state = CS_HOVER;
+        return CS_HOVER;
+      }
+    }
+    state = CS_NORMAL;
+    return CS_NORMAL;
+  }
+}
+
+class StateButton extends Button
+{
+  public boolean selected;
+  StateButton(boolean Selected, String text, int x_pos, int y_pos, int Width, int Height, color textColor, color background)
+  {
+    selected = Selected;
+    title = text;
+    x = x_pos;
+    y = y_pos;
+    w = Width;
+    h = Height;
+    fg = textColor;
+    bg = background;
+  }
+  void draw()
+  {
+    noStroke();
+    switch(state)
+    {
+    case CS_NORMAL:
+      if(selected)
+      {
+        fill(bg, 255);
+      }
+      else
+      {
+        fill(bg, 153);
+      }
+      break;
+    case CS_HOVER:
+      fill(bg, 255);
+      break;
+    case CS_PRESS:
+      fill(bg, 192);
+      break;
+    }
+    rect(x, y, w, h);
+    fill(fg);
+    textSize(h/1.5);
+    textAlign(CENTER, CENTER);
+    text(title, x, y, w, h);
+  }
+  int hitTest()
+  {
+    int test_result = super.hitTest();
+    if (test_result == CS_CLICK)
+    {
+      selected = true;
+    }
+    return test_result;
+  }
+}
+
 Control control = new Control(10, 10, 300, 20, #000000, #66ccff);
 Slider slider = new Slider(0, 10, 50, 300, 20, #66ccff, #000000);
+Button button = new Button("Button", 10, 110, 300, 20, #000000, #66ccff);
+StateButton sbutton = new StateButton(false, "Button", 10, 160, 300, 20, #000000, #66ccff);
 
 void setup()
 {
@@ -154,5 +270,9 @@ void draw()
   control.draw();
   slider.hitTest();
   slider.draw();
+  button.hitTest();
+  button.draw();
+  sbutton.hitTest();
+  sbutton.draw();
 }
 
