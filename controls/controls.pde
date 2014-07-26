@@ -1,7 +1,10 @@
 final int CS_NORMAL =  0, 
-CS_HOVER =  1, 
-CS_PRESS =  2, 
-CS_CLICK =  3;
+CS_HOVER = 1, 
+CS_PRESS = 2, 
+CS_CLICK = 3, 
+CS_RELEASE = 4;
+
+
 class Control
 {
   float x, y, w, h;
@@ -41,6 +44,11 @@ class Control
             return CS_CLICK;
           }
           return CS_PRESS;
+        }
+        if (state == CS_PRESS)
+        {
+          state = CS_HOVER;
+          return CS_RELEASE;
         }
         state = CS_HOVER;
         return CS_HOVER;
@@ -143,7 +151,8 @@ class Button extends Control
 {
   public String title;
   Button()
-  {}
+  {
+  }
   Button(String text, int x_pos, int y_pos, int Width, int Height, color textColor, color background)
   {
     title = text;
@@ -175,29 +184,6 @@ class Button extends Control
     textAlign(CENTER, CENTER);
     text(title, x, y, w, h);
   }
-  int hitTest()
-  {
-    if (mouseX>=x&&mouseX-x<=w)
-    {
-      if (mouseY>=y&&mouseY-y<=h)
-      {
-        // Mouse in area
-        if (mousePressed)
-        {
-          if (state != CS_PRESS)
-          {
-            state = CS_PRESS;
-            return CS_CLICK;
-          }
-          return CS_PRESS;
-        }
-        state = CS_HOVER;
-        return CS_HOVER;
-      }
-    }
-    state = CS_NORMAL;
-    return CS_NORMAL;
-  }
 }
 
 class StateButton extends Button
@@ -220,11 +206,10 @@ class StateButton extends Button
     switch(state)
     {
     case CS_NORMAL:
-      if(selected)
+      if (selected)
       {
         fill(bg, 255);
-      }
-      else
+      } else
       {
         fill(bg, 153);
       }
@@ -253,10 +238,50 @@ class StateButton extends Button
   }
 }
 
+class Switch extends Button
+{
+  boolean value;
+  Switch(boolean initVal, String text, int x_pos, int y_pos, int Width, int Height, color textColor, color background)
+  {
+    value = initVal;
+    title = text;
+    x = x_pos;
+    y = y_pos;
+    w = Width;
+    h = Height;
+    fg = textColor;
+    bg = background;
+  }  
+  int hitTest()
+  {
+    int result = super.hitTest();
+    if (result == CS_CLICK)
+    {
+      value = !value;
+    }
+    return result;
+  }
+  void draw()
+  {
+    super.draw();
+    stroke(#FFFFFF);
+    if (value)
+    {
+      fill(#00ff00,255);
+    }
+    else
+    {
+      fill(#666666,153);
+    }
+    ellipse(x+8,y+h/2,h/2,h/2);
+  }
+}
+
 Control control = new Control(10, 10, 300, 20, #000000, #66ccff);
-Slider slider = new Slider(0, 10, 50, 300, 20, #66ccff, #000000);
+Slider slider = new Slider(0, 10, 60, 300, 20, #66ccff, #000000);
 Button button = new Button("Button", 10, 110, 300, 20, #000000, #66ccff);
 StateButton sbutton = new StateButton(false, "Button", 10, 160, 300, 20, #000000, #66ccff);
+Switch swbutton = new Switch(false, "Switch", 10, 210, 300, 20, #000000, #66ccff);
 
 void setup()
 {
@@ -274,5 +299,7 @@ void draw()
   button.draw();
   sbutton.hitTest();
   sbutton.draw();
+  swbutton.hitTest();
+  swbutton.draw();
 }
 
