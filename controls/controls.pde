@@ -13,7 +13,7 @@ class Control
   Control()
   {
   }
-  Control(int x_pos, int y_pos, int Width, int Height, color foreground, color background)
+  Control(float x_pos, float y_pos, float Width, float Height, color foreground, color background)
   {
     state = CS_NORMAL;
     x = x_pos;
@@ -62,7 +62,7 @@ class Control
 class Slider extends Control
 {
   public float value;
-  Slider(float init_val, int x_pos, int y_pos, int Width, int Height, color background, color tint)
+  Slider(float init_val, float x_pos, float y_pos, float Width, float Height, color background, color tint)
   {
     //    super.Control(x_pos, y_pos, Width, Height, tint, background);
     state = CS_NORMAL;
@@ -149,13 +149,13 @@ class Slider extends Control
 
 class Button extends Control
 {
-  public String title;
+  public String caption;
   Button()
   {
   }
-  Button(String text, int x_pos, int y_pos, int Width, int Height, color textColor, color background)
+  Button(String Title, float x_pos, float y_pos, float Width, float Height, color textColor, color background)
   {
-    title = text;
+    caption = Title;
     x = x_pos;
     y = y_pos;
     w = Width;
@@ -182,17 +182,20 @@ class Button extends Control
     fill(fg);
     textSize(h/1.5);
     textAlign(CENTER, CENTER);
-    text(title, x, y, w, h);
+    text(caption, x+w/2, y+h/2);
+	// This line has an unknown problem with processing.js
+	// the text(String, int, int, int, int) will never draw
+	// So I have to do it in another way
   }
 }
 
 class StateButton extends Button
 {
   public boolean selected;
-  StateButton(boolean Selected, String text, int x_pos, int y_pos, int Width, int Height, color textColor, color background)
+  StateButton(boolean Selected, String Title, float x_pos, float y_pos, float Width, float Height, color textColor, color background)
   {
     selected = Selected;
-    title = text;
+    caption = Title;
     x = x_pos;
     y = y_pos;
     w = Width;
@@ -225,7 +228,7 @@ class StateButton extends Button
     fill(fg);
     textSize(h/1.5);
     textAlign(CENTER, CENTER);
-    text(title, x, y, w, h);
+    text(caption, x+w/2, y+h/2);
   }
   int hitTest()
   {
@@ -241,10 +244,10 @@ class StateButton extends Button
 class Switch extends Button
 {
   boolean value;
-  Switch(boolean initVal, String text, int x_pos, int y_pos, int Width, int Height, color textColor, color background)
+  Switch(boolean initVal, String Title, float x_pos, float y_pos, float Width, float Height, color textColor, color background)
   {
     value = initVal;
-    title = text;
+    caption = Title;
     x = x_pos;
     y = y_pos;
     w = Width;
@@ -276,6 +279,8 @@ class Switch extends Button
     ellipse(x+8,y+h/2,h/2,h/2);
   }
 }
+
+// debug
 
 Control control = new Control(10, 10, 300, 20, #000000, #66ccff);
 Slider slider = new Slider(0, 10, 60, 300, 20, #66ccff, #000000);
