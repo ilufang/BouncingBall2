@@ -379,6 +379,7 @@ class Ball
 
 // Global variables
 Ball[] balls = new Ball[64];
+boolean pausebutton = false;
 
 //Sliders
 Slider gravity_ctrl = new Slider("Gravity", 0, 520, 60, 210, 30, #0000ff, #000000, #66ccff);
@@ -398,7 +399,7 @@ void setup(){
 }
 
 
-boolean pausebutton = false;
+
 
 // draws buttons and sliders
 void draw(){
