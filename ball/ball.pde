@@ -106,7 +106,7 @@ class Slider extends Control
     super.draw();
     fill(textcolor);
     textAlign(CENTER, CENTER);
-    textSize(h/1.5);
+    textSize(h/2);
     text(caption, x+w/2, y+h/2);
     w = w_temp; // Set back for slider drawing
     // Draw Slider
@@ -210,7 +210,7 @@ class Button extends Control
     }
     rect(x, y, w, h);
     fill(fg);
-    textSize(h/1.5);
+    textSize(h/2);
     textAlign(CENTER, CENTER);
     text(caption, x+w/2, y+h/2);
     // This line has an unknown problem with processing.js
@@ -256,7 +256,7 @@ class StateButton extends Button
     }
     rect(x, y, w, h);
     fill(fg);
-    textSize(h/1.5);
+    textSize(h/2);
     textAlign(CENTER, CENTER);
     text(caption, x+w/2, y+h/2);
   }
@@ -378,8 +378,10 @@ class Ball
   void collideWith(Ball aBall)
   {
   }
+  void move()
   void draw()
   {
+    move();
     colorMode(RGB);
     stroke(#000000);
     fill(tint);
