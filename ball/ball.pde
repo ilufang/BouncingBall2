@@ -391,14 +391,27 @@ Slider eloss_ctrl = new Slider("Energy Loss", 0, 520, 180, 210, 30, #0000ff, #00
 Button pause =  new Button("Pause",520,10,100,40,#000000,#66ccff);
 Button iterate = new Button("Iterate", 630, 10, 100, 40, #000000, #66ccff);
 
+
+//*****BETA****** Canvas size set to 800,600
 void setup(){
   size(800, 600);
 }
 
+
+boolean pausebutton = false;
+
+// draws buttons and sliders
 void draw(){
   background(#ffffff);
   if (pause.hitTest()==CS_CLICK){
-    
+    if (pausebutton == false){
+      pausebutton = true;
+      pause.caption = "Play";
+    }
+    else if (pausebutton == true){
+      pausebutton = false;
+      pause.caption = "Pause";
+    }
   }
   if (iterate.hitTest()==CS_CLICK){
     
