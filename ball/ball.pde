@@ -105,7 +105,7 @@ class Slider extends Control
     w*=1.1;
     super.draw();
     fill(textcolor);
-    textAlign(CENTER,CENTER);
+    textAlign(CENTER, CENTER);
     textSize(h/1.5);
     text(caption, x+w/2, y+h/2);
     w = w_temp; // Set back for slider drawing
@@ -257,7 +257,7 @@ class StateButton extends Button
     rect(x, y, w, h);
     fill(fg);
     textSize(h/1.5);
-    textAlign(CENTER,CENTER);
+    textAlign(CENTER, CENTER);
     text(caption, x+w/2, y+h/2);
   }
   int hitTest()
@@ -313,7 +313,7 @@ class Switch extends Button
 
 class point
 {
-  public float x,y;
+  public float x, y;
   point()
   {
     x=0;
@@ -324,11 +324,11 @@ class point
     x=x0;
     y=y0;
   }
-  point map()
-  {
-    // This function converts the coordinates
-    // TODO
-  }
+  //  point map()
+  //  {
+  //    // This function converts the coordinates
+  //    // TODO
+  //  }
 }
 
 
@@ -353,16 +353,18 @@ class Ball
     y=0;
     vx=0;
     vy=0;
+    r=10;
     colorMode(HSB);
-    tint = color(random(0,240),204,168);
+    tint = color(random(0, 240), 204, 168);
   }
   Ball(float x0, float y0)
   {
-    x=x0;
+    x=x0;q
     y=y0;
     vx=0;
     vy=0;
-    tint = color(random(0,240),204,168);
+    r=10;
+    tint = color(random(0, 240), 204, 168);
   }
   Ball(float x0, float y0, float v0x, float v0y)
   {
@@ -370,9 +372,41 @@ class Ball
     y=y0;
     vx=v0x;
     vy=v0y;
-    tint = color(random(0,240),204,168);
+    r=10;
+    tint = color(random(0, 240), 204, 168);
+  }
+  void collideWith(Ball aBall)
+  {
+  }
+  void draw()
+  {
+    colorMode(RGB);
+    stroke(#000000);
+    fill(tint);
+    ellipse(x, y, 2*r, 2*r);
   }
 }
 
 // Global variables
-Ball balls[64];
+Ball[] balls = new Ball[64];
+int count = 3;
+
+void setup()
+{
+  size(800, 600);
+  for (int i=0; i!=count; i++)
+  {
+    balls[i]=new Ball(random(0, 500), random(0, 500), 0, 0);
+  }
+}
+
+void draw()
+{
+  colorMode(RGB);
+  background(#ffffff);
+  for (int i=0; i!=count; i++)
+  {
+    balls[i].draw();
+  }
+}
+
