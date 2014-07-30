@@ -334,8 +334,9 @@ class point
 
 // Global Environment Controllers
 
-float g = 1;
+double g = 5, af=0, cofr = 1, eloss=0;
 
+float cx=500, cy=500;
 
 // Main Class declaration
 
@@ -353,7 +354,7 @@ class Ball
     y=0;
     vx=0;
     vy=0;
-    r=10;
+    r=5;
     colorMode(HSB);
     tint = color(random(0, 240), 204, 168);
   }
@@ -363,7 +364,7 @@ class Ball
     y=y0;
     vx=0;
     vy=0;
-    r=10;
+    r=5;
     tint = color(random(0, 240), 204, 168);
   }
   Ball(float x0, float y0, float v0x, float v0y)
@@ -372,40 +373,89 @@ class Ball
     y=y0;
     vx=v0x;
     vy=v0y;
-    r=10;
+    r=5;
     tint = color(random(0, 240), 204, 168);
   }
-  void collideWith(Ball aBall)
+  void collideWith(Ball b)
   {
+//    print("collide!");
+    double baseline = atan((y-b.y)/(x-b.x));
+    double vert = -(1/baseline);
+    
+  }
+  void collided(float v1x, float v1y)
+  {
+    vx=v1x;
+    vy=v1y;
   }
   void move()
   {
+    // collision detection
+    if(x<0)
+    {
+      x=0;
+      vx*=-1;
+    }
+    if(x>cx)
+    {
+      x=cx;
+      vx*=-1;
+    }
+    if(y<0)
+    {
+      y=0;
+      vy*=-1;
+    }
+    vy-=(g/frameRate);
     x+=vx;
     y+=vy;
-    vy-=g;
+
   }
   void draw()
   {
     move();
     colorMode(RGB);
-    stroke(#000000);
+    noStroke();
     fill(tint);
     // draw in real coordinate system
-    point newPt = mapPt(x,y);
-    ellipse(x-r, y, 2*r, 2*r);
+
+    ellipse(mapx(x-r), mapy(y), 2*r, 2*r);
   }
+}
+
+float mapx(float x)
+{
+  return x;
+}
+float mapy(float y)
+{
+  return 500-y;
 }
 
 // Global variables
 Ball[] balls = new Ball[64];
-int count = 3;
+int count = 64;
+
+void collision()
+{
+  for (int i = 0; i < count; i++)
+  {
+    for (int j = i + 1; j < count; j++)
+    {
+      if (dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) <= 2 * balls[i].r)
+      {
+        balls[i].collideWith(balls[j]);
+      }
+    }
+  }      
+}
 
 void setup()
 {
-  size(800, 600);
+  size(500, 500);
   for (int i=0; i!=count; i++)
   {
-    balls[i]=new Ball(random(0, 500), random(0, 500), 0, 0);
+    balls[i]=new Ball(random(0, 500), random(0,500), random(0,5), 0);
   }
 }
 
@@ -417,5 +467,6 @@ void draw()
   {
     balls[i].draw();
   }
+  collision();
 }
 
