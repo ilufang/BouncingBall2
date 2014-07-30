@@ -208,9 +208,9 @@ class Button extends Control
       fill(bg, 192);
       break;
     }
-    rect(x, y, w, h);
+    rect(x, y, w, h, 5);
     fill(fg);
-    textSize(h/1.5);
+    textSize(h/2);
     textAlign(CENTER, CENTER);
     text(caption, x+w/2, y+h/2);
     // This line has an unknown problem with processing.js
@@ -254,7 +254,7 @@ class StateButton extends Button
       fill(bg, 192);
       break;
     }
-    rect(x, y, w, h);
+    rect(x, y, w, h, 5);
     fill(fg);
     textSize(h/1.5);
     textAlign(CENTER, CENTER);
@@ -406,13 +406,23 @@ void collision()
 
 float mapx(float x)
 {
-  return x*100;
+  return x;
 }
 float mapy(float y)
 {
-  return 500-(y*100);
+  return 500-y;
 }
 
+//Sliders
+Slider gravity_ctrl = new Slider("Gravity", 0, 520, 60, 210, 30, #0000ff, #000000, #66ccff);
+Slider af_ctrl = new Slider("Air Friction", 0, 520, 100, 210, 30, #0000ff, #000000, #66ccff);
+Slider cofr_ctrl = new Slider("Restitution", 0, 520, 140, 210, 30, #0000ff, #000000, #66ccff);
+Slider eloss_ctrl = new Slider("Energy Loss", 0, 520, 180, 210, 30, #0000ff, #000000, #66ccff);
+
+
+//Buttons
+Button pause =  new Button("Pause",520,10,100,40,#000000,#66ccff);
+Button iterate = new Button("Iterate", 630, 10, 100, 40, #000000, #66ccff);
 
 //Global variables
 Ball[] balls = new Ball[64];
@@ -424,7 +434,7 @@ void setup()
   background(255);
   for (int i=0; i!=count; i++)
   {
-    balls[i]=new Ball(random(0, 500), random(0, 500), 0, 0);
+    balls[i]=new Ball(random(5, 495), random(5, 495), 0, 0);
   }
 }
 
@@ -437,6 +447,36 @@ void draw()
     balls[i].draw();
   }
   collision();
+  
+  
+  
+  
+  //Buttons & Sliders
+  if (pause.hitTest()==CS_CLICK){
+    
+  }
+  if (iterate.hitTest()==CS_CLICK){
+    
+  }
+  if(gravity_ctrl.hitTest()==CS_PRESS){
+    String grav = String.format("%.2f", (float)((gravity_ctrl.value)*10));
+    gravity_ctrl.caption = "Gravity:"+grav+" m/s^2";
+  }
+  if(af_ctrl.hitTest()==CS_PRESS){
+    af_ctrl.caption = "Air Friction:"+(int)((af_ctrl.value)*100)+"%";
+  }
+  if(cofr_ctrl.hitTest()==CS_PRESS){
+    cofr_ctrl.caption = "Restitution:"+(int)((cofr_ctrl.value)*100)+"%";
+  }
+  if(eloss_ctrl.hitTest()==CS_PRESS){
+  }
+  
+  pause.draw();
+  iterate.draw();
+  gravity_ctrl.draw();
+  af_ctrl.draw();
+  cofr_ctrl.draw();
+  eloss_ctrl.draw();
 }
 
 
