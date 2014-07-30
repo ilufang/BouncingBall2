@@ -4,11 +4,12 @@ CS_PRESS = 2,
 CS_CLICK = 3, 
 CS_RELEASE = 4;
 
+boolean _Control_input_capture =false;
 
 class Control
 {
-  float x, y, w, h;
-  color fg, bg;
+  public float x, y, w, h;
+  public color fg, bg;
   int state;
   Control()
   {
@@ -38,12 +39,22 @@ class Control
         // Mouse in area
         if (mousePressed)
         {
-          if (state != CS_PRESS)
+          if (state == CS_HOVER)
           {
+            // Click
             state = CS_PRESS;
             return CS_CLICK;
           }
-          return CS_PRESS;
+          if (state == CS_PRESS)
+          {
+            // Hold
+            return CS_PRESS;
+          }
+          if (state == CS_NORMAL)
+          {
+            // Hold and enter
+            return CS_NORMAL;
+          }
         }
         if (state == CS_PRESS)
         {
@@ -62,16 +73,19 @@ class Control
 class Slider extends Control
 {
   public float value;
-  Slider(float init_val, float x_pos, float y_pos, float Width, float Height, color background, color tint)
+  public String caption;
+  public color textcolor;
+  Slider(String title, float init_val, float x_pos, float y_pos, float Width, float Height, color blockColor, color textColor, color background)
   {
-    //    super.Control(x_pos, y_pos, Width, Height, tint, background);
+    caption = title;
     state = CS_NORMAL;
     x = x_pos;
     y = y_pos;
     w = Width/1.1;
     h = Height;
-    fg = tint;
+    fg = blockColor;
     bg = background;
+    textcolor = textColor;
     value = init_val;
   }
   void draw()
@@ -88,6 +102,10 @@ class Slider extends Control
     float w_temp = w; // Slider background must be complete
     w*=1.1;
     super.draw();
+    fill(textcolor);
+    textAlign(CENTER,CENTER);
+    textSize(h/1.5);
+    text(caption, x+w/2, y+h/2);
     w = w_temp; // Set back for slider drawing
     // Draw Slider
     noStroke();
@@ -113,6 +131,11 @@ class Slider extends Control
   }
   int hitTest()
   {
+    if (_Control_input_capture&&state!=CS_PRESS)
+    {
+      return CS_NORMAL;
+    }
+    // WORK CONTINUES HERE
     if (mouseY>=y&&mouseY-y<=h)
     {
       if (mouseX>=x+value*w&&mouseX-(x+value*w)<=w/10&&value>=0&&value<=1)
@@ -121,7 +144,12 @@ class Slider extends Control
         if (mousePressed)
         {
           // Update value
-          if (state != CS_PRESS)
+          if (state == CS_NORMAL)
+          {
+            // Hold mouse and enter
+            return CS_NORMAL;
+          }
+          if (state == CS_HOVER)
           {
             // Just Began dragging
             drag_begin_displacement = mouseX;
@@ -183,9 +211,9 @@ class Button extends Control
     textSize(h/1.5);
     textAlign(CENTER, CENTER);
     text(caption, x+w/2, y+h/2);
-	// This line has an unknown problem with processing.js
-	// the text(String, int, int, int, int) will never draw
-	// So I have to do it in another way
+    // This line has an unknown problem with processing.js
+    // the text(String, int, int, int, int) will never draw
+    // So I have to do it in another way
   }
 }
 
@@ -227,7 +255,7 @@ class StateButton extends Button
     rect(x, y, w, h);
     fill(fg);
     textSize(h/1.5);
-    textAlign(CENTER, CENTER);
+    textAlign(CENTER,CENTER);
     text(caption, x+w/2, y+h/2);
   }
   int hitTest()
@@ -243,7 +271,7 @@ class StateButton extends Button
 
 class Switch extends Button
 {
-  boolean value;
+  public boolean value;
   Switch(boolean initVal, String Title, float x_pos, float y_pos, float Width, float Height, color textColor, color background)
   {
     value = initVal;
@@ -270,20 +298,19 @@ class Switch extends Button
     stroke(#FFFFFF);
     if (value)
     {
-      fill(#00ff00,255);
-    }
-    else
+      fill(#00ff00, 255);
+    } else
     {
-      fill(#666666,153);
+      fill(#666666, 153);
     }
-    ellipse(x+8,y+h/2,h/2,h/2);
+    ellipse(x+8, y+h/2, h/2, h/2);
   }
 }
 
 // debug
 
 Control control = new Control(10, 10, 300, 20, #000000, #66ccff);
-Slider slider = new Slider(0, 10, 60, 300, 20, #66ccff, #000000);
+Slider slider = new Slider("Slider", 0, 10, 60, 300, 20, #0000ff, #000000, #66ccff);
 Button button = new Button("Button", 10, 110, 300, 20, #000000, #66ccff);
 StateButton sbutton = new StateButton(false, "Button", 10, 160, 300, 20, #000000, #66ccff);
 Switch swbutton = new Switch(false, "Switch", 10, 210, 300, 20, #000000, #66ccff);
@@ -306,5 +333,6 @@ void draw()
   sbutton.draw();
   swbutton.hitTest();
   swbutton.draw();
+  text(slider.value, 50, 400);
 }
 
