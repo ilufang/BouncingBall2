@@ -105,8 +105,8 @@ class Slider extends Control
     w*=1.1;
     super.draw();
     fill(textcolor);
-    textAlign(CENTER,CENTER);
-    textSize(h/1.5);
+    textAlign(CENTER, CENTER);
+    textSize(h/2);
     text(caption, x+w/2, y+h/2);
     w = w_temp; // Set back for slider drawing
     // Draw Slider
@@ -257,7 +257,7 @@ class StateButton extends Button
     rect(x, y, w, h);
     fill(fg);
     textSize(h/1.5);
-    textAlign(CENTER,CENTER);
+    textAlign(CENTER, CENTER);
     text(caption, x+w/2, y+h/2);
   }
   int hitTest()
@@ -313,7 +313,7 @@ class Switch extends Button
 
 class point
 {
-  public float x,y;
+  public float x, y;
   point()
   {
     x=0;
@@ -354,8 +354,9 @@ class Ball
     y=0;
     vx=0;
     vy=0;
+    r=10;
     colorMode(HSB);
-    tint = color(random(0,240),204,168);
+    tint = color(random(0, 240), 204, 168);
   }
   Ball(float x0, float y0)
   {
@@ -363,7 +364,8 @@ class Ball
     y=y0;
     vx=0;
     vy=0;
-    tint = color(random(0,240),204,168);
+    r=10;
+    tint = color(random(0, 240), 204, 168);
   }
   Ball(float x0, float y0, float v0x, float v0y)
   {
@@ -371,7 +373,8 @@ class Ball
     y=y0;
     vx=v0x;
     vy=v0y;
-    tint = color(random(0,240),204,168);
+    r=10;
+    tint = color(random(0, 240), 204, 168);
   }
   void collideWith(Ball aBall)
   {
@@ -379,9 +382,10 @@ class Ball
   }
   void draw()
   {
+    colorMode(RGB);
     stroke(#000000);
     fill(tint);
-    ellipse(x,y,2*r,2*r);
+    ellipse(x, y, 2*r, 2*r);
   }
 }
 
@@ -407,17 +411,19 @@ int count = 3;
 
 void setup()
 {
-  size(500, 500);
+  size(800, 600);
   background(255);
-  balls[0] = new Ball(int(random(30, 470)), int(random(30, 470)), int(random(2, 7)), int(random(2, 7)));
-  balls[1] = new Ball(int(random(30, 470)), int(random(30, 470)), int(random(2, 7)), int(random(2, 7)));
-  balls[2] = new Ball(int(random(30, 470)), int(random(30, 470)), int(random(2, 7)), int(random(2, 7)));
+  for (int i=0; i!=count; i++)
+  {
+    balls[i]=new Ball(random(0, 500), random(0, 500), 0, 0);
+  }
 }
 
 void draw()
 {
-  background(255);
-  for (int i = 0; i < count; i++)
+  colorMode(RGB);
+  background(#ffffff);
+  for (int i=0; i!=count; i++)
   {
     balls[i].draw();
   }
