@@ -404,6 +404,15 @@ void collision()
   }      
 }
 
+float mapx(float x)
+{
+  return width - x;
+}
+float mapy(float y)
+{
+  return height - y;
+}
+
 
 //Global variables
 Ball[] balls = new Ball[64];
@@ -429,8 +438,6 @@ void draw()
   }
   collision();
 }
-
-
 
 
 
