@@ -324,18 +324,19 @@ class point
     x=x0;
     y=y0;
   }
-  point map()
-  {
-    // This function converts the coordinates
-    // TODO
-  }
+//  point map()
+//  {
+//    // This function converts the coordinates
+//    // TODO
+//  }
 }
 
+
+//PROGRAM STARTS HERE
 
 // Global Environment Controllers
 
 float g = 0;
-
 
 // Main Class declaration
 
@@ -372,7 +373,62 @@ class Ball
     vy=v0y;
     tint = color(random(0,240),204,168);
   }
+  void collideWith(Ball aBall)
+  {
+    
+  }
+  void draw()
+  {
+    stroke(#000000);
+    fill(tint);
+    ellipse(x,y,2*r,2*r);
+  }
 }
 
-// Global variables
-Ball balls[64];
+void collision()
+{
+  for (int i = 0; i < count; i++)
+  {
+    for (int j = i + 1; j < count; j++)
+    {
+      if (dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) <= 2 * balls[i].r)
+      {
+        balls[i].collideWith(balls[j]);
+        print("Ball " + i + " with coordinates " + balls[i].x + " and " + balls[i].y + " collided with " + "ball " + j + " with coordinates " + balls[j].x + " and " + balls[j].y + ".\n");
+      }
+    }
+  }      
+}
+
+
+//Global variables
+Ball[] balls = new Ball[64];
+int count = 3;
+
+void setup()
+{
+  size(500, 500);
+  background(255);
+  balls[0] = new Ball(int(random(30, 470)), int(random(30, 470)), int(random(2, 7)), int(random(2, 7)));
+  balls[1] = new Ball(int(random(30, 470)), int(random(30, 470)), int(random(2, 7)), int(random(2, 7)));
+  balls[2] = new Ball(int(random(30, 470)), int(random(30, 470)), int(random(2, 7)), int(random(2, 7)));
+}
+
+void draw()
+{
+  background(255);
+  for (int i = 0; i < count; i++)
+  {
+    balls[i].draw();
+  }
+  collision();
+}
+
+
+
+
+
+
+
+
+
