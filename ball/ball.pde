@@ -334,7 +334,7 @@ class point
 
 // Global Environment Controllers
 
-float g = 0;
+float g = 1;
 
 
 // Main Class declaration
@@ -359,7 +359,7 @@ class Ball
   }
   Ball(float x0, float y0)
   {
-    x=x0;q
+    x=x0;
     y=y0;
     vx=0;
     vy=0;
@@ -379,13 +379,20 @@ class Ball
   {
   }
   void move()
+  {
+    x+=vx;
+    y+=vy;
+    vy-=g;
+  }
   void draw()
   {
     move();
     colorMode(RGB);
     stroke(#000000);
     fill(tint);
-    ellipse(x, y, 2*r, 2*r);
+    // draw in real coordinate system
+    point newPt = mapPt(x,y);
+    ellipse(x-r, y, 2*r, 2*r);
   }
 }
 
