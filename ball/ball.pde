@@ -406,11 +406,11 @@ void collision()
 
 float mapx(float x)
 {
-  return width - x;
+  return x*100;
 }
 float mapy(float y)
 {
-  return height - y;
+  return 500-(y*100);
 }
 
 
