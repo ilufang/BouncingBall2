@@ -613,8 +613,9 @@ void draw()
   }
   // Detect mouse launch input
   if (mouseX > 0 && mouseX < 500 && mouseY > 0 && mouseY < 500) {
-    if (mousePressed && isDragging) {
+    if (mousePressed) {
       if (state == 0 && count != balls.length - 1) {
+        isDragging = true;
         tempmousex = mouseX;
         tempmousey = mouseY;
         state = 1;
