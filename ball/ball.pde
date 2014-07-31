@@ -377,20 +377,35 @@ class Ball
   }
 }
 
+//Table Class
+Class TableCell
+{
+  //Variables
+  public int index;
+  
+  // Constructors
+  TableCell()
+  {
+    index = 
+  }
+  
+}
+
+
 // Global variables
 Ball[] balls = new Ball[64];
 boolean pausebutton = false;
 
 //Sliders
-Slider gravity_ctrl = new Slider("Gravity", 0, 520, 60, 210, 30, #0000ff, #000000, #66ccff);
-Slider af_ctrl = new Slider("Air Friction", 0, 520, 100, 210, 30, #0000ff, #000000, #66ccff);
-Slider cofr_ctrl = new Slider("Restitution", 0, 520, 140, 210, 30, #0000ff, #000000, #66ccff);
-Slider eloss_ctrl = new Slider("Energy Loss", 0, 520, 180, 210, 30, #0000ff, #000000, #66ccff);
-
+Slider gravity_ctrl = new Slider("Gravity", 0, 520, 60, 240, 30, #0000ff, #000000, #66ccff);
+Slider af_ctrl = new Slider("Air Friction", 0, 520, 100, 240, 30, #0000ff, #000000, #66ccff);
+Slider cofr_ctrl = new Slider("Restitution", 0, 520, 140, 240, 30, #0000ff, #000000, #66ccff);
+Slider eloss_ctrl = new Slider("Energy Loss", 0, 520, 180, 240, 30, #0000ff, #000000, #66ccff);
+Slider radius_ctrl = new Slider ("Radius", 0, 520, 220, 240, 30, #0000ff, #000000, #66ccff);
 
 //Buttons
-Button pause =  new Button("Pause",520,10,100,40,#000000,#66ccff);
-Button iterate = new Button("Iterate", 630, 10, 100, 40, #000000, #66ccff);
+Button pause =  new Button("Pause",520,10,115,40,#000000,#66ccff);
+Button iterate = new Button("Iterate", 645, 10, 115, 40, #000000, #66ccff);
 
 
 //*****BETA****** Canvas size set to 800,600
@@ -429,6 +444,10 @@ void draw(){
   }
   if(eloss_ctrl.hitTest()==CS_PRESS){
   }
+  if(radius_ctrl.hitTest()==CS_PRESS){
+    
+  }
+  
   
   pause.draw();
   iterate.draw();
