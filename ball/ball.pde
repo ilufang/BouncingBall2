@@ -336,7 +336,9 @@ class point
 
 // Global Environment Controllers
 
-float g = 0;
+double g = 5, af = 0, cofr = 1, eloss = 0;
+
+float cx = 500, cy = 500;
 
 // Main Class declaration
 
@@ -354,7 +356,7 @@ class Ball
     y=0;
     vx=0;
     vy=0;
-    r=10;
+    r=5;
     colorMode(HSB);
     tint = color(random(0, 240), 204, 168);
   }
@@ -364,7 +366,7 @@ class Ball
     y=y0;
     vx=0;
     vy=0;
-    r=10;
+    r=5;
     tint = color(random(0, 240), 204, 168);
   }
   Ball(float x0, float y0, float v0x, float v0y)
@@ -373,20 +375,61 @@ class Ball
     y=y0;
     vx=v0x;
     vy=v0y;
-    r=10;
+    r=5;
     tint = color(random(0, 240), 204, 168);
   }
-  void collideWith(Ball aBall)
+  void collideWith(Ball b)
   {
+//    print("collide!");
+    double baseline = atan((y-b.y)/(x-b.x));
+    double vert = -(1/baseline);
     
+  }
+  void collided(float v1x, float v1y)
+  {
+    vx=v1x;
+    vy=v1y;
+  }
+  void move()
+  {
+    // collision detection
+    if(x<5)
+    {
+      x=5;
+      vx*=-1;
+    }
+    if(x>cx-5)
+    {
+      x=cx-5;
+      vx*=-1;
+    }
+    if(y<5)
+    {
+      y=5;
+      vy*=-1;
+    }
+    vy-=(g/frameRate);
+    x+=vx;
+    y+=vy;
   }
   void draw()
   {
+    move();
     colorMode(RGB);
-    stroke(#000000);
+    noStroke();
     fill(tint);
-    ellipse(x, y, 2*r, 2*r);
+    //draw in real coordinate system  
+    ellipse(mapx(x-r), mapy(y), 2*r, 2*r);
   }
+}
+
+float mapx(float x)
+{
+  return x;
+}
+float mapy(float y)
+{
+  return 500-y;
 }
 
 void collision()
@@ -404,19 +447,10 @@ void collision()
   }      
 }
 
-float mapx(float x)
-{
-  return x;
-}
-float mapy(float y)
-{
-  return 500-y;
-}
-
 //Sliders
 Slider gravity_ctrl = new Slider("Gravity", 0, 520, 60, 210, 30, #0000ff, #000000, #66ccff);
 Slider af_ctrl = new Slider("Air Friction", 0, 520, 100, 210, 30, #0000ff, #000000, #66ccff);
-Slider cofr_ctrl = new Slider("Restitution", 0, 520, 140, 210, 30, #0000ff, #000000, #66ccff);
+Slider cofr_ctrl = new Slider("Coefficient of Restitution", 0, 520, 140, 210, 30, #0000ff, #000000, #66ccff);
 Slider eloss_ctrl = new Slider("Energy Loss", 0, 520, 180, 210, 30, #0000ff, #000000, #66ccff);
 
 
@@ -424,9 +458,12 @@ Slider eloss_ctrl = new Slider("Energy Loss", 0, 520, 180, 210, 30, #0000ff, #00
 Button pause =  new Button("Pause",520,10,100,40,#000000,#66ccff);
 Button iterate = new Button("Iterate", 630, 10, 100, 40, #000000, #66ccff);
 
+
 //Global variables
 Ball[] balls = new Ball[64];
 int count = 3;
+boolean pausebutton = false;
+
 
 void setup()
 {
@@ -434,7 +471,7 @@ void setup()
   background(255);
   for (int i=0; i!=count; i++)
   {
-    balls[i]=new Ball(random(5, 495), random(5, 495), 0, 0);
+    balls[i]=new Ball(random(5, 495), random(5, 495), random(0, 5), 0);
   }
 }
 
@@ -453,7 +490,14 @@ void draw()
   
   //Buttons & Sliders
   if (pause.hitTest()==CS_CLICK){
-    
+    if (pausebutton == false){
+      pausebutton = true;
+      pause.caption = "Play";
+    }
+    else if (pausebutton == true){
+      pausebutton = false;
+      pause.caption = "Pause";
+    }
   }
   if (iterate.hitTest()==CS_CLICK){
     
