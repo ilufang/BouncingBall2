@@ -464,7 +464,7 @@ Button iterate = new Button("Iterate", 645, 10, 115, 40, #000000, #66ccff);
 
 //Global variables
 Ball[] balls = new Ball[64];
-int count = 64;
+int count = 5;
 int state = 0;
 float tempmousex, tempmousey;
 boolean pausebutton = false;
