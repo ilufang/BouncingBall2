@@ -483,26 +483,31 @@ void setup()
 void draw()
 {
   colorMode(RGB);
-  background(#ffffff);
-  for (int i=0; i!=count; i++)
-  {
-    balls[i].draw();
-  }
-  collision();
-  
-  if (mouseX > 0 && mouseX < 500 && mouseY > 0 && mouseY < 500){
-    if (mousePressed){
-      if (state == 0 && count != balls.length - 1){
-        tempmousex = mouseX;
-        tempmousey = mouseY;
-        state = 1;
+  if (!pausebutton){
+    background(#ffffff);
+    for (int i=0; i!=count; i++)
+    {
+      balls[i].draw();
+    }
+    collision();
+    
+    if (mouseX > 0 && mouseX < 500 && mouseY > 0 && mouseY < 500){
+      if (mousePressed){
+        if (state == 0 && count != balls.length - 1){
+          tempmousex = mouseX;
+          tempmousey = mouseY;
+          state = 1;
+        }
       }
     }
+    else{
+      state = 0;
+    }
   }
-  else{
-    state = 0;
+  if (pausebutton){
+    fill(360);
+    rect(500, 0, 1000, 1000);
   }
-  
   
   
   //Buttons & Sliders
