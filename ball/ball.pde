@@ -1,4 +1,4 @@
-final int skipRate = 5;
+final int skipRate = 50;
 
 //Controls
 
@@ -340,7 +340,7 @@ class point
 
 // Global Environment Controllers
 
-float g = 500, af=1, cofr = 1, eloss=0;
+float g = 500, af = 1, cofr = 1, eloss = 0;
 
 float cx=500, cy=500;
 
@@ -512,7 +512,7 @@ void collision_detect()
         float theta = atan((balls[i].y-balls[j].y)/(balls[i].x-balls[j].x));
         float midx = (balls[i].x+balls[j].x)/2;
         float midy = (balls[i].y+balls[j].y)/2;
-        float exd = (balls[i].r+balls[j].r)/2;
+        float exd = (balls[i].r+balls[j].r)/2+2;
         if (balls[i].x>midx)
         {
           balls[i].x = midx + exd * cos(theta);
@@ -644,7 +644,7 @@ void mouseReleased()
     distance = dist(tempmousex, tempmousey, mouseX, mouseY);
     xdist = mouseX - tempmousex;
     ydist = mouseY - tempmousey;
-    balls[count]=new Ball(tempmousex, -tempmousey + 500, 100*xdist/(0.5*frameRate), 100*-ydist/(0.5*frameRate), 10, 1);
+    balls[count]=new Ball(tempmousex, -tempmousey + 500, 100*xdist/(0.5*frameRate), 100*-ydist/(0.5*frameRate), 30, 1);
     count++;
     state = 0;
   }
