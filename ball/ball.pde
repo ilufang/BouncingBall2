@@ -407,7 +407,8 @@ class Ball
   void draw()
   {
     colorMode(RGB);
-    stroke(#000000);
+    noStroke();
+//    stroke(#000000);
     fill(tint);
     // draw in real coordinate system
 
@@ -540,7 +541,7 @@ void collision_detect()
 
 void setup()
 {
-  size(800, 600);
+  size(800, 750);
   frameRate(100);
   for (int i = 0; i != count; i++)
   {
@@ -623,7 +624,7 @@ void draw()
 void mousePressed()
 {
   // Detect mouse launch input
-  if (mouseX > 0 && mouseX < 500 && mouseY > 0 && mouseY < 500)
+  if (mouseX > 10 && mouseX < 490 && mouseY > 10 && mouseY < 490)
   {
     if (state == 0 && count != balls.length - 1) {
       isDragging = true;
