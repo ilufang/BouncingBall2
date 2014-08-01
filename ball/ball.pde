@@ -1,4 +1,4 @@
-final int skipRate = 50;
+final int skipRate = 5;
 
 //Controls
 
@@ -140,7 +140,6 @@ class Slider extends Control
     {
       value = 1;
     }
-
   }
   int hitTest()
   {
@@ -320,25 +319,10 @@ class Switch extends Button
   }
 }
 
-// Data Structure Declarations
-
-class point
-{
-  public float x, y;
-  point()
-  {
-    x=0;
-    y=0;
-  }
-  point(float x0, float y0)
-  {
-    x=x0;
-    y=y0;
-  }
-}
-
 
 // Global Environment Controllers
+
+int max_balls = 64;
 
 float g = 500, af = 1, cofr = 1, eloss = 0;
 
@@ -349,10 +333,15 @@ float cx=500, cy=500;
 class Ball
 {
   // Instance variables
+  public boolean highlighted;
   public float x, y;
   public float vx, vy;
   public float r, m;
-  color tint;
+  public color tint;
+
+  // cheating
+  public boolean[] overlapped = new boolean[max_balls];
+
   // Contructors
   Ball()
   {
@@ -362,6 +351,7 @@ class Ball
     vy=0;
     r=10;
     m=1;
+    highlighted = false;
     colorMode(HSB, 360, 100, 100);
     tint = color(random(0, 360), 60, 100);
   }
@@ -373,6 +363,7 @@ class Ball
     vy=v0y;
     r=radius;
     m=mass;
+    highlighted = false;
     colorMode(HSB, 360, 100, 100);
     tint = color(random(0, 60)*6, 60, 100);
   }
@@ -406,12 +397,65 @@ class Ball
   }
   void draw()
   {
-    colorMode(RGB);
+    colorMode(RGB, 255, 255, 255);
+    if (highlighted) {
+      noStroke();
+      fill(#888888, 255);
+      ellipse(mapx(x), mapy(y), 3*r, 3*r);
+    }
     stroke(#000000);
-    fill(tint);
+    fill(tint, 255);
     // draw in real coordinate system
-
     ellipse(mapx(x), mapy(y), 2*r, 2*r);
+  }
+}
+
+class TableCell extends Control
+{
+  private int index;
+  private Slider m_ctrl, r_ctrl;
+  TableCell(int i)
+  {
+    index = i;
+    m_ctrl = new Slider("Mass", 0.1, 0, 0, 0, 0, #000000, #666666, #cccccc);
+    r_ctrl = new Slider("Radius", 0.1, 0, 0, 0, 0, #000000, #666666, #cccccc);
+  }
+  void draw(float x, float y, float w, float h)
+  {
+    if (mouseX>x&&mouseX<x+w&&mouseY>y&&mouseY<y+h)
+    {
+      // Hover over, highlight ball
+      balls[index].highlighted=true;
+      fill(balls[index].tint, 255);
+    } else
+    {
+      balls[index].highlighted=false;
+      fill(balls[index].tint, 128);
+    }
+    noStroke();
+    rect(x, y, w, h);
+    textAlign(LEFT, CENTER);
+    fill(#000000);
+    textSize(16);
+    text("#"+(index+1)+" X: "+(int)balls[index].x+" Y: "+(int)balls[index].y+" V: "+String.format("%.4f", (sqrt(pow(balls[index].vx, 2)+pow(balls[index].vy, 2))/100/skipRate)), x, y+h/2);
+    m_ctrl.x=x+w/2+10;
+    m_ctrl.y=y;
+    m_ctrl.w=w/4-25;
+    m_ctrl.h=h;
+    if (m_ctrl.hitTest()==CS_PRESS)
+    {
+      balls[index].m = m_ctrl.value*10;
+    }
+    m_ctrl.draw();
+    r_ctrl.x=x+3*w/4+10;
+    r_ctrl.y=y;
+    r_ctrl.w=w/4-25;
+    r_ctrl.h=h;
+    if (r_ctrl.hitTest()==CS_PRESS)
+    {
+      balls[index].r = r_ctrl.value*100;
+    }
+    r_ctrl.draw();
   }
 }
 
@@ -435,15 +479,18 @@ Slider eloss_ctrl = new Slider("Energy Loss", 0, 520, 180, 240, 30, #0000ff, #00
 
 //Buttons
 Button pause =  new Button("Pause", 520, 10, 115, 40, #000000, #66ccff);
-Button iterate = new Button("Reset", 645, 10, 115, 40, #000000, #66ccff);
+Button reset = new Button("Reset", 645, 10, 115, 40, #000000, #66ccff);
 
 
 // Global variables
-Ball[] balls = new Ball[64];
+Ball[] balls = new Ball[max_balls];
+TableCell[] table = new TableCell[max_balls];
 int count = 0;
 int state = 0;
 float tempmousex, tempmousey;
 boolean pausebutton = false;
+int scrollline = 0;
+//PImage logo;
 
 
 // Functions 
@@ -500,6 +547,7 @@ void collide(Ball b1, Ball b2)  // COLLISION!!!
   //  println(new_v1x+" "+new_v1y+" "+new_v2x+" "+new_v2y);
 }
 
+
 void collision_detect()
 {
   for (int i = 0; i < count; i++)
@@ -508,31 +556,50 @@ void collision_detect()
     {
       if (dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) <= balls[i].r+balls[j].r)
       {
-        // Resolve position overlapping
-        float theta = atan((balls[i].y-balls[j].y)/(balls[i].x-balls[j].x));
-        float midx = (balls[i].x+balls[j].x)/2;
-        float midy = (balls[i].y+balls[j].y)/2;
-        float exd = (balls[i].r+balls[j].r)/2+2;
-        if (balls[i].x>midx)
-        {
-          balls[i].x = midx + exd * cos(theta);
-          balls[j].x = midx - exd * cos(theta);
-        } else
-        {
-          balls[i].x = midx - exd * cos(theta);
-          balls[j].x = midx + exd * cos(theta);
-        }
-        if (balls[i].y>midy)
-        {
-          balls[i].y = midy + exd * sin(theta);
-          balls[j].y = midy - exd * sin(theta);
-        } else
-        {
-          balls[i].y = midy - exd * sin(theta);
-          balls[j].y = midy + exd * sin(theta);
-        }
         // Collide
-        collide(balls[i], balls[j]);
+
+        if (!balls[i].overlapped[j])
+        {
+          collide(balls[i], balls[j]);
+          balls[i].overlapped[j]=true;
+        }
+        // Resolve position overlapping
+        /*
+        float theta = atan((balls[i].y-balls[j].y)/(balls[i].x-balls[j].x));
+         if(theta<0)
+         {
+         theta+=PI;
+         }
+         //        println(theta*180/PI);
+         float midx = (balls[i].x+balls[j].x)/2;
+         float midy = (balls[i].y+balls[j].y)/2;
+         float exd = abs((balls[i].r+balls[j].r)/2);
+         if(theta>HALF_PI)
+         {
+         theta=PI-theta;
+         }
+         if (balls[i].x>midx)
+         {
+         balls[i].x = midx + exd * cos(theta);
+         balls[j].x = midx - exd * cos(theta);
+         } else
+         {
+         balls[i].x = midx - exd * cos(theta);
+         balls[j].x = midx + exd * cos(theta);
+         }
+         if (balls[i].y>midy)
+         {
+         balls[i].y = midy + exd * sin(theta);
+         balls[j].y = midy - exd * sin(theta);
+         } else
+         {
+         balls[i].y = midy - exd * sin(theta);
+         balls[j].y = midy + exd * sin(theta);
+         }
+         */
+      } else if (balls[i].overlapped[j])
+      {
+        balls[i].overlapped[j]= false;
       }
     }
   }
@@ -540,14 +607,9 @@ void collision_detect()
 
 void setup()
 {
-  size(800, 600);
+  size(800, 670);
   frameRate(100);
-  /*
-  for (int i=0; i!=count; i++)
-   {
-   balls[i]=new Ball(random(0, 500), random(0, 500), random(-500, 500), random(-500, 500), 10, 1);
-   }
-   */
+//  logo = loadImage("logo.jpg");
 }
 
 
@@ -563,7 +625,7 @@ void control_update()
       pause.caption = "Pause";
     }
   }
-  if (iterate.hitTest()==CS_CLICK) {
+  if (reset.hitTest()==CS_CLICK) {
     count = 0;
   }
   if (gravity_ctrl.hitTest()==CS_PRESS) {
@@ -580,7 +642,7 @@ void control_update()
   }
 
   pause.draw();
-  iterate.draw();
+  reset.draw();
   gravity_ctrl.draw();
   af_ctrl.draw();
   cofr_ctrl.draw();
@@ -595,7 +657,7 @@ void draw()
   background(#ffffff);
   noStroke();
   fill(#f0f0f0);
-  rect(0,0,500,500);
+  rect(0, 0, 500, 500);
   for (int i=0; i!=count; i++)
   {
     balls[i].draw();
@@ -611,19 +673,6 @@ void draw()
       }
     }
   }
-  // Detect mouse launch input
-  if (mouseX > 0 && mouseX < 500 && mouseY > 0 && mouseY < 500) {
-    if (mousePressed) {
-      if (state == 0 && count != balls.length - 1) {
-        isDragging = true;
-        tempmousex = mouseX;
-        tempmousey = mouseY;
-        state = 1;
-      }
-    }
-  } else {
-    state = 0;
-  }
   if (isDragging)
   {
     stroke(#000000);
@@ -631,10 +680,34 @@ void draw()
     ellipse(tempmousex, tempmousey, 20, 20);
     line(tempmousex, tempmousey, mouseX, mouseY);
   }
-
+  for (int i = 0; i != 5; i++)
+  {
+    if (i>=count)
+    {
+      break;
+    }
+    table[i+scrollline].draw(10, 510+30*i, 780, 25);
+  }
   control_update();
+//  image(logo, 510, 220);
 }
 
+void mousePressed()
+{
+  // Detect mouse launch input
+  if (mouseX > 10 && mouseX < 490 && mouseY > 10 && mouseY < 490)
+  {
+    if (state == 0 && count < max_balls) {
+      isDragging = true;
+      tempmousex = mouseX;
+      tempmousey = mouseY;
+      state = 1;
+    }
+  } else
+  {
+    state = 0;
+  }
+}
 
 void mouseReleased()
 {
@@ -644,9 +717,20 @@ void mouseReleased()
     distance = dist(tempmousex, tempmousey, mouseX, mouseY);
     xdist = mouseX - tempmousex;
     ydist = mouseY - tempmousey;
-    balls[count]=new Ball(tempmousex, -tempmousey + 500, 100*xdist/(0.5*frameRate), 100*-ydist/(0.5*frameRate), 30, 1);
+    balls[count] = new Ball(tempmousex, -tempmousey + 500, 100*xdist/(0.5*frameRate), 100*-ydist/(0.5*frameRate), 10, 1);
+    table[count] = new TableCell(count);
     count++;
     state = 0;
   }
 }
+
+void mouseWheel(MouseEvent event) {
+  float e = event.getCount();
+  if (e == 1 && scrollline<count-5) {
+    scrollline = scrollline + 1;
+  } else if (e == -1 && scrollline>0) {
+    scrollline = scrollline -1 ;
+  }
+}
+
 
