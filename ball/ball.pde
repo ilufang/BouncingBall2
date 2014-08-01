@@ -378,18 +378,6 @@ class Ball
 }
 
 //Table Class
-Class TableCell
-{
-  //Variables
-  public int index;
-  
-  // Constructors
-  TableCell()
-  {
-    index = 
-  }
-  
-}
 
 
 // Global variables
