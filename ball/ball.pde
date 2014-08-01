@@ -626,7 +626,7 @@ void mousePressed()
   // Detect mouse launch input
   if (mouseX > 10 && mouseX < 490 && mouseY > 10 && mouseY < 490)
   {
-    if (state == 0 && count != balls.length - 1) {
+    if (state == 0 && count != 64) {
       isDragging = true;
       tempmousex = mouseX;
       tempmousey = mouseY;
