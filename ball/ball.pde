@@ -484,6 +484,7 @@ Button reset = new Button("Reset", 645, 10, 115, 40, #000000, #66ccff);
 
 // Global variables
 Ball[] balls = new Ball[max_balls];
+Ball[] realballs = new Ball[max_balls];
 TableCell[] table = new TableCell[max_balls];
 int count = 0;
 int state = 0;
@@ -500,8 +501,10 @@ float cast_shadow(float leng, float theta)
   return leng*cos(abs(theta));
 }
 
-void collide(Ball b1, Ball b2)  // COLLISION!!!
+void collide(Ball b1, Ball b2, boolean overlap)  // COLLISION!!!
 {
+  int i = 0;
+  float tempvx1, tempvy1, tempvx2, tempvy2, tempv1, tempv2, origb1x, origb1y, origb2x, origb2y, v1, v2, consumed1, remaining1, consumed2, remaining2;
   // Decide baselines
   float thetaa = atan((b1.y-b2.y)/(b1.x-b2.x));
   float thetab;
@@ -512,7 +515,18 @@ void collide(Ball b1, Ball b2)  // COLLISION!!!
   {
     thetab = thetaa + HALF_PI;
   }
-
+  
+  tempvx1 = b1.vx;
+  tempvy1 = b1.vy;
+  tempv1 = sqrt(pow(b1.vx,2)+pow(b1.vy,2));
+  tempvx2 = b2.vx;
+  tempvy2 = b2.vy;
+  tempv2 = sqrt(pow(b2.vx,2)+pow(b2.vy,2));
+  origb1x = b1.x - tempvx1;
+  origb1y = b1.y - tempvy1;
+  origb2x = b2.x - tempvx2;
+  origb2y = b2.y - tempvy2;
+  
   // decompose v
   float va1 = cast_shadow(b1.vx, thetaa) + cast_shadow(b1.vy, thetaa-HALF_PI);
   float vb1 = cast_shadow(b1.vx, thetab) + cast_shadow(b1.vy, thetab-HALF_PI);
@@ -544,6 +558,40 @@ void collide(Ball b1, Ball b2)  // COLLISION!!!
   b1.vy = new_v1y*(1-eloss);
   b2.vx = new_v2x*(1-eloss);
   b2.vy = new_v2y*(1-eloss);
+  v1=sqrt(pow(b1.vx,2)+pow(b1.vy,2));
+  v2=sqrt(pow(b2.vx,2)+pow(b2.vy,2));
+  
+  
+  if (overlap)
+  {
+    if (i == 0)
+    {
+      if (dist(b1.x, b1.y, b2.x, b2.y) < b1.r + b2.r + 0.01 && dist(b1.x, b1.y, b2.x, b2.y) > b1.r + b2.r - 0.01){
+        i = 1;
+      } else
+      {
+        b1.x -= tempvx1/1000;
+        b1.y -= tempvy1/1000;
+        b2.x -= tempvx2/1000;
+        b2.y -= tempvy2/1000;
+      }
+    }
+  }
+  
+  if (i == 1)
+  {
+  consumed1 = dist(origb1x, origb1y, b1.x, b1.y)/tempv1;
+  remaining1 = 1 - consumed1;
+  consumed2 = dist(origb2x, origb2y, b2.x, b2.y)/tempv2;
+  remaining2 = 1 - consumed2;
+  
+  b1.x += remaining1*b1.vx;
+  b1.y += remaining1*b1.vy;
+  b2.x += remaining2*b2.vx;
+  b2.y += remaining2*b2.vy;
+  }
+  
+  
   //  println(new_v1x+" "+new_v1y+" "+new_v2x+" "+new_v2y);
 }
 
@@ -557,49 +605,7 @@ void collision_detect()
       if (dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) <= balls[i].r+balls[j].r)
       {
         // Collide
-
-        if (!balls[i].overlapped[j])
-        {
-          collide(balls[i], balls[j]);
-          balls[i].overlapped[j]=true;
-        }
-        // Resolve position overlapping
-        /*
-        float theta = atan((balls[i].y-balls[j].y)/(balls[i].x-balls[j].x));
-         if(theta<0)
-         {
-         theta+=PI;
-         }
-         //        println(theta*180/PI);
-         float midx = (balls[i].x+balls[j].x)/2;
-         float midy = (balls[i].y+balls[j].y)/2;
-         float exd = abs((balls[i].r+balls[j].r)/2);
-         if(theta>HALF_PI)
-         {
-         theta=PI-theta;
-         }
-         if (balls[i].x>midx)
-         {
-         balls[i].x = midx + exd * cos(theta);
-         balls[j].x = midx - exd * cos(theta);
-         } else
-         {
-         balls[i].x = midx - exd * cos(theta);
-         balls[j].x = midx + exd * cos(theta);
-         }
-         if (balls[i].y>midy)
-         {
-         balls[i].y = midy + exd * sin(theta);
-         balls[j].y = midy - exd * sin(theta);
-         } else
-         {
-         balls[i].y = midy - exd * sin(theta);
-         balls[j].y = midy + exd * sin(theta);
-         }
-         */
-      } else if (balls[i].overlapped[j])
-      {
-        balls[i].overlapped[j]= false;
+        collide(balls[i], balls[j], dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) < balls[i].r+balls[j].r + 1);
       }
     }
   }
@@ -660,7 +666,7 @@ void draw()
   rect(0, 0, 500, 500);
   for (int i=0; i!=count; i++)
   {
-    balls[i].draw();
+    realballs[i].draw();
   }
   if (!pausebutton)
   {
@@ -669,7 +675,7 @@ void draw()
       for (int j=0; j!=count; j++)
       {
         collision_detect();
-        balls[j].move();
+        realballs[j].move();
       }
     }
   }
@@ -690,6 +696,7 @@ void draw()
   }
   control_update();
 //  image(logo, 510, 220);
+  realballs = balls;
 }
 
 void mousePressed()
