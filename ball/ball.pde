@@ -437,7 +437,7 @@ class TableCell extends Control
     textAlign(LEFT, CENTER);
     fill(#000000);
     textSize(16);
-    text("#"+(b_index+1)+" X: "+(int)balls[b_index].x+" Y: "+(int)balls[b_index].y+" V: "+String.format("%.4f", (sqrt(pow(balls[b_index].vx, 2)+pow(balls[b_index].vy, 2))/100/skipRate)), x, y+h/2);
+    text("#"+(b_index+1)+" X: "+(int)balls[b_index].x+" Y: "+(int)balls[b_index].y+" V: "+String.format("%.4f", (sqrt(pow(balls[b_index].vx, 2)+pow(balls[b_index].vy, 2))/100/skipRate)), x, y, w/2, h);
     m_ctrl.x=x+w/2+10;
     m_ctrl.y=y;
     m_ctrl.w=w/4-25;
