@@ -412,11 +412,11 @@ class Ball
 
 class TableCell extends Control
 {
-  private int index;
+  private int b_index;
   private Slider m_ctrl, r_ctrl;
   TableCell(int i)
   {
-    index = i;
+    b_index = i;
     m_ctrl = new Slider("Mass", 0.1, 0, 0, 0, 0, #000000, #666666, #cccccc);
     r_ctrl = new Slider("Radius", 0.1, 0, 0, 0, 0, #000000, #666666, #cccccc);
   }
@@ -425,26 +425,26 @@ class TableCell extends Control
     if (mouseX>x&&mouseX<x+w&&mouseY>y&&mouseY<y+h)
     {
       // Hover over, highlight ball
-      balls[index].highlighted=true;
-      fill(balls[index].tint, 255);
+      balls[b_index].highlighted=true;
+      fill(balls[b_index].tint, 255);
     } else
     {
-      balls[index].highlighted=false;
-      fill(balls[index].tint, 128);
+      balls[b_index].highlighted=false;
+      fill(balls[b_index].tint, 128);
     }
     noStroke();
     rect(x, y, w, h);
     textAlign(LEFT, CENTER);
     fill(#000000);
     textSize(16);
-    text("#"+(index+1)+" X: "+(int)balls[index].x+" Y: "+(int)balls[index].y+" V: "+String.format("%.4f", (sqrt(pow(balls[index].vx, 2)+pow(balls[index].vy, 2))/100/skipRate)), x, y+h/2);
+    text("#"+(b_index+1)+" X: "+(int)balls[b_index].x+" Y: "+(int)balls[b_index].y+" V: "+round((sqrt(pow(balls[b_index].vx, 2)+pow(balls[b_index].vy, 2))/100/skipRate*1000)), x, y+h/2); // 100 here is static frameRate, 1000 makes digits visible
     m_ctrl.x=x+w/2+10;
     m_ctrl.y=y;
     m_ctrl.w=w/4-25;
     m_ctrl.h=h;
     if (m_ctrl.hitTest()==CS_PRESS)
     {
-      balls[index].m = m_ctrl.value*10;
+      balls[b_index].m = m_ctrl.value*10;
     }
     m_ctrl.draw();
     r_ctrl.x=x+3*w/4+10;
@@ -453,7 +453,7 @@ class TableCell extends Control
     r_ctrl.h=h;
     if (r_ctrl.hitTest()==CS_PRESS)
     {
-      balls[index].r = r_ctrl.value*100;
+      balls[b_index].r = r_ctrl.value*100;
     }
     r_ctrl.draw();
   }
