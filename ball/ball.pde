@@ -412,11 +412,11 @@ class Ball
 
 class TableCell extends Control
 {
-  private int index;
+  private int b_index;
   private Slider m_ctrl, r_ctrl;
   TableCell(int i)
   {
-    index = i;
+    b_index = i;
     m_ctrl = new Slider("Mass", 0.1, 0, 0, 0, 0, #000000, #666666, #cccccc);
     r_ctrl = new Slider("Radius", 0.1, 0, 0, 0, 0, #000000, #666666, #cccccc);
   }
@@ -425,26 +425,26 @@ class TableCell extends Control
     if (mouseX>x&&mouseX<x+w&&mouseY>y&&mouseY<y+h)
     {
       // Hover over, highlight ball
-      balls[index].highlighted=true;
-      fill(balls[index].tint, 255);
+      balls[b_index].highlighted=true;
+      fill(balls[b_index].tint, 255);
     } else
     {
-      balls[index].highlighted=false;
-      fill(balls[index].tint, 128);
+      balls[b_index].highlighted=false;
+      fill(balls[b_index].tint, 128);
     }
     noStroke();
     rect(x, y, w, h);
     textAlign(LEFT, CENTER);
     fill(#000000);
     textSize(16);
-    text("#"+(index+1)+" X: "+(int)balls[index].x+" Y: "+(int)balls[index].y+" V: "+String.format("%.4f", (sqrt(pow(balls[index].vx, 2)+pow(balls[index].vy, 2))/100/skipRate)), x, y+h/2);
+    text("#"+(b_index+1)+" X: "+(int)balls[b_index].x+" Y: "+(int)balls[b_index].y+" V: "+round((sqrt(pow(balls[b_index].vx, 2)+pow(balls[b_index].vy, 2))/100/skipRate*1000)), x, y+h/2); // 100 here is static frameRate, 1000 makes digits visible
     m_ctrl.x=x+w/2+10;
     m_ctrl.y=y;
     m_ctrl.w=w/4-25;
     m_ctrl.h=h;
     if (m_ctrl.hitTest()==CS_PRESS)
     {
-      balls[index].m = m_ctrl.value*10;
+      balls[b_index].m = m_ctrl.value*10;
     }
     m_ctrl.draw();
     r_ctrl.x=x+3*w/4+10;
@@ -453,7 +453,7 @@ class TableCell extends Control
     r_ctrl.h=h;
     if (r_ctrl.hitTest()==CS_PRESS)
     {
-      balls[index].r = r_ctrl.value*100;
+      balls[b_index].r = r_ctrl.value*100;
     }
     r_ctrl.draw();
   }
@@ -501,7 +501,7 @@ float cast_shadow(float leng, float theta)
   return leng*cos(abs(theta));
 }
 
-void collide(Ball b1, Ball b2, boolean overlap)  // COLLISION!!!
+void collide(Ball b1, Ball b2, int k, int interval, float x1, float y1, float x2, float y2)  // COLLISION!!!
 {
   int i = 0;
   float tempvx1, tempvy1, tempvx2, tempvy2, tempv1, tempv2, origb1x, origb1y, origb2x, origb2y, v1, v2, consumed1, remaining1, consumed2, remaining2;
@@ -522,10 +522,10 @@ void collide(Ball b1, Ball b2, boolean overlap)  // COLLISION!!!
   tempvx2 = b2.vx;
   tempvy2 = b2.vy;
   tempv2 = sqrt(pow(b2.vx,2)+pow(b2.vy,2));
-  origb1x = b1.x - tempvx1;
-  origb1y = b1.y - tempvy1;
-  origb2x = b2.x - tempvx2;
-  origb2y = b2.y - tempvy2;
+  origb1x = b1.x - tempvx1*(k/interval);
+  origb1y = b1.y - tempvy1*(k/interval);
+  origb2x = b2.x - tempvx2*(k/interval);
+  origb2y = b2.y - tempvy2*(k/interval);
   
   // decompose v
   float va1 = cast_shadow(b1.vx, thetaa) + cast_shadow(b1.vy, thetaa-HALF_PI);
@@ -562,52 +562,94 @@ void collide(Ball b1, Ball b2, boolean overlap)  // COLLISION!!!
   v2=sqrt(pow(b2.vx,2)+pow(b2.vy,2));
   
   
-  if (overlap)
+
+
+  if (i == 0)
   {
-    if (i == 0)
-    {
-      if (dist(b1.x, b1.y, b2.x, b2.y) < b1.r + b2.r + 0.01 && dist(b1.x, b1.y, b2.x, b2.y) > b1.r + b2.r - 0.01){
-        i = 1;
-      } else
-      {
-        b1.x -= tempvx1/1000;
-        b1.y -= tempvy1/1000;
-        b2.x -= tempvx2/1000;
-        b2.y -= tempvy2/1000;
-      }
+    while (dist(x1, y1, x2, y2) < b1.r + b2.r){
+      x1 -= tempvx1/10000;
+      y1 += tempvy1/10000;
+      x2 -= tempvx2/10000;
+      y2 += tempvy2/10000;
+      
+//      println(b1.x + " " + b1.y + " " + b2.x + " " + b2.y + "      " + dist(b1.x, b1.y, b2.x, b2.y));
     }
+//    println("END");
+    i = 1;
   }
   
   if (i == 1)
   {
-  consumed1 = dist(origb1x, origb1y, b1.x, b1.y)/tempv1;
-  remaining1 = 1 - consumed1;
-  consumed2 = dist(origb2x, origb2y, b2.x, b2.y)/tempv2;
-  remaining2 = 1 - consumed2;
+//  consumed1 = dist(origb1x, origb1y, x1, y1)/tempv1;
+//  remaining1 = 1 - consumed1;
+//  consumed2 = dist(origb2x, origb2y, x2, y2)/tempv2;
+//  remaining2 = 1 - consumed2;
+  remaining1 = 1 - k/interval;
+  remaining2 = 1 - k/interval;
   
-  b1.x += remaining1*b1.vx;
-  b1.y += remaining1*b1.vy;
-  b2.x += remaining2*b2.vx;
-  b2.y += remaining2*b2.vy;
+  x1 += remaining1*b1.vx*(k/interval);
+  y1 -= remaining1*b1.vy*(k/interval);
+  x2 += remaining2*b2.vx*(k/interval);
+  y2 -= remaining2*b2.vy*(k/interval);
   }
   
-  
+  b1.x = x1;
+  b1.y = y1;
+  b2.x = x2;
+  b2.y = y2;
+  println("ball moved from " + origb1x + ";" + origb1y + " to " + b1.x + ";" + b1.y);
+  println("ball moved from " + origb2x + ";" + origb2y + " to " + b2.x + ";" + b2.y);
   //  println(new_v1x+" "+new_v1y+" "+new_v2x+" "+new_v2y);
 }
 
 
 void collision_detect()
 {
+  
   for (int i = 0; i < count; i++)
   {
     for (int j = i + 1; j < count; j++)
     {
-      if (dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) <= balls[i].r+balls[j].r)
+      int interval = intervalamount(balls[i], balls[j]);
+      for (int k = 0; k < interval; k++)
       {
-        // Collide
-        collide(balls[i], balls[j], dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) < balls[i].r+balls[j].r + 1);
+        if (dist(balls[i].x + (k/interval)*balls[i].vx, balls[i].y + (k/interval)*balls[i].vy, balls[j].x + (k/interval)*balls[j].vx, balls[j].y + (k/interval)*balls[j].vy) <= balls[i].r + balls[j].r)
+        {
+//          println("collision " + k + " " + balls[i].r + " " + balls[j].r);
+//          fill(0);
+//          line(balls[i].x, mapy(balls[i].y), balls[j].x, mapy(balls[j].y));
+//          text(dist(balls[i].x + (k/interval)*balls[i].vx, balls[i].y + (k/interval)*balls[i].vy, balls[j].x + (k/interval)*balls[j].vx, balls[j].y + (k/interval)*balls[j].vy), 100, 100);
+          collide(balls[i], balls[j], k, interval, balls[i].x + (k/interval)*balls[i].vx, balls[i].y + (k/interval)*balls[i].vy, balls[j].x + (k/interval)*balls[j].vx, balls[j].y + (k/interval)*balls[j].vy);
+        }
       }
     }
+  }
+  
+//  for (int i = 0; i < count; i++)
+//  {
+//    for (int j = i + 1; j < count; j++)
+//    {
+//      if (dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) <= balls[i].r+balls[j].r)
+//      {
+//        // Collide
+//        collide(balls[i], balls[j], dist(balls[i].x, balls[i].y, balls[j].x, balls[j].y) < balls[i].r+balls[j].r + 1);
+//      }
+//    }
+//  }
+}
+
+int intervalamount(Ball b1, Ball b2)
+{
+  int v1, v2;
+  v1 = ceil(sqrt(pow(b1.vx, 2) + pow(b1.vy, 2)));
+  v2 = ceil(sqrt(pow(b2.vx, 2) + pow(b2.vy, 2)));
+  
+  if (v1 > v2)
+  {
+    return v1;
+  } else
+  {
+    return v2;
   }
 }
 
@@ -731,7 +773,8 @@ void mouseReleased()
   }
 }
 
-void mouseWheel(MouseEvent event) {
+void mouseWheel(MouseEvent event)
+{
   float e = event.getCount();
   if (e == 1 && scrollline<count-5) {
     scrollline = scrollline + 1;
